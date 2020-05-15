@@ -1,12 +1,10 @@
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
-import java.sql.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @ThreadSafe
 public class BanditAlgorithm {
@@ -38,7 +36,7 @@ public void performBanditAlgorithm(ConcurrentLinkedQueue<ActionClass> inpActions
     var action = inpActions.poll();
     int count = 0;
     while (action !=null){//init
-        generateAndSetTrueActionValues(action); //sets q*(a)
+        //generateAndSetTrueActionValues(action); //sets q*(a)
         actionsMap.put(count, action);
         synchronized (this){
             greedyQueue.offer(action); //greedy action at top of Q. we need to remove and reinsert when value of elements change.
@@ -92,6 +90,23 @@ public void performBanditAlgorithm(ConcurrentLinkedQueue<ActionClass> inpActions
         Double rewardReturn = ThreadLocalRandom.current().nextGaussian() + a.getTrueActionValue();
         //System.out.println("Reward generated for action " + a.getActionName() + " : " + rewardReturn.floatValue());
         return rewardReturn.floatValue();
+    }
+
+    //resets the entire actionMap
+    public ConcurrentHashMap<Integer, ActionClass> actionValuesReset(){
+        synchronized (actionsMap){
+            ConcurrentHashMap<Integer, ActionClass> temp = new ConcurrentHashMap<>();
+            ActionClass newAction;
+            for (var entry : actionsMap.entrySet()){
+                var key = entry.getKey();
+                var value = entry.getValue();
+                newAction = new ActionClass(value.getActionName());
+                newAction.setTrueActionValue(value.getTrueActionValue());
+                temp.put(key, newAction);
+            }
+            clear();    //clears action map and greedy queue
+            return temp;
+        }
     }
 
     //get action values from a gaussian distribution with 0 mean and unit variance.

@@ -1,6 +1,7 @@
 import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.ThreadSafe;
 
-//Inner class - Action
+@ThreadSafe
 public class ActionClass{
     private final String actionName;
     @GuardedBy("this") private float actionValue;

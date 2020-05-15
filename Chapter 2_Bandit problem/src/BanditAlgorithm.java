@@ -109,6 +109,7 @@ public void performBanditAlgorithm(ConcurrentLinkedQueue<ActionClass> inpActions
         }
     }
 
+    //below method is not being used as main method is currently setting it for us.
     //get action values from a gaussian distribution with 0 mean and unit variance.
     public void generateAndSetTrueActionValues(ActionClass a){
         Double val = ThreadLocalRandom.current().nextGaussian();

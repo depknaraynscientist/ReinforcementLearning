@@ -1,7 +1,5 @@
 import net.jcip.annotations.GuardedBy;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 //Inner class - Action
 public class ActionClass{
     private final String actionName;

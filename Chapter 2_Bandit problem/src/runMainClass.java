@@ -6,33 +6,30 @@ import java.util.concurrent.ThreadLocalRandom;
 public class runMainClass {
     public static void main(String[] args) {
         BanditAlgorithm obj1 = new BanditAlgorithm();
-        //reference map
-        ConcurrentHashMap<Integer, ActionClass> actions = new ConcurrentHashMap<>();
+        ConcurrentHashMap<Integer, ActionClass> action_obj = new ConcurrentHashMap<>();
         for (int i=0; i< 10; i++){
-            actions.put(i, new ActionClass("action " + i));
-            obj1.generateAndSetTrueActionValues(actions.get(i));
+            action_obj.put(i, new ActionClass("action " + i));
+            generateAndSetTrueActionValues(action_obj.get(i));
         }
-        int iterations = 10000;
-        ConcurrentLinkedQueue<ActionClass> actionsQ = new ConcurrentLinkedQueue<>(actions.values());
-        obj1.performBanditAlgorithm(actionsQ, iterations, (float) 0.01);
-        obj1.clear();
-
-        obj1.performBanditAlgorithm(actionsQ, iterations, (float) 0.1);
-        obj1.clear();
-
-        obj1.performBanditAlgorithm(actionsQ, iterations, (float) 0.3);
-        obj1.clear();
-
-        obj1.performBanditAlgorithm(actionsQ, iterations, (float) 0.9);
-        obj1.clear();
+        int iterations = 100000;
+        action_obj = runBandit(obj1, action_obj, iterations, (float) 0.1);
+        action_obj = runBandit(obj1, action_obj, iterations, (float) 0.3);
+        action_obj = runBandit(obj1, action_obj, iterations, (float) 0.9);
     }
 
 
+    public static ConcurrentHashMap<Integer, ActionClass> runBandit(BanditAlgorithm obj1, ConcurrentHashMap<Integer, ActionClass> actions, int iterations, float epsilon){
+        ConcurrentLinkedQueue<ActionClass> actionsQ = new ConcurrentLinkedQueue<>(actions.values());
+        obj1.performBanditAlgorithm(actionsQ, iterations, (float) epsilon);
+        return obj1.actionValuesReset();
+    }
+
     //get action values from a gaussian distribution with 0 mean and unit variance.
-    public void generateAndSetTrueActionValues(ActionClass a){
+    public static void generateAndSetTrueActionValues(ActionClass a){
         Double val = ThreadLocalRandom.current().nextGaussian();
 //        System.out.println("True Value generated from 0 mean 1 sd gaussian for action : "
 //                            + a.getActionName() + " " + val.floatValue());
         a.setTrueActionValue(val.floatValue());
+        System.out.println("Value of " + a.getActionName() + " : " + val.floatValue());
     }
 }

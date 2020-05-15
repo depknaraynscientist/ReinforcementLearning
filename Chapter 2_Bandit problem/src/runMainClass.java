@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class runMainClass {
     public static void main(String[] args) {
+        long start = System.nanoTime();
         BanditAlgorithm obj1 = new BanditAlgorithm();
         ConcurrentHashMap<Integer, ActionClass> action_obj = new ConcurrentHashMap<>();
         for (int i=0; i< 10; i++){
@@ -15,6 +16,8 @@ public class runMainClass {
         action_obj = runBandit(obj1, action_obj, iterations, (float) 0.1);
         action_obj = runBandit(obj1, action_obj, iterations, (float) 0.3);
         action_obj = runBandit(obj1, action_obj, iterations, (float) 0.9);
+        double execTime = (System.nanoTime()-start)/1e9;
+        System.out.println(execTime);
     }
 
 

@@ -2,11 +2,8 @@ import com.opencsv.CSVWriter;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.PriorityQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.file.Files.newBufferedWriter;
@@ -43,27 +40,25 @@ public class GamblersProblem {
             for (int i = 0; i < 100; i++){//looping through all states.
                 double oldValue = valueMap.get(i); //gets the old value from the map.
                 //get an action
-                for (int a = 1; a < 51; a++){//loop thru all actions.
-                    int action = Integer.min(i, 100-i); //taking the minimum of the above values.
-                    if (i + action == 100){//terminal state reached.
+                int action = Integer.min(i, 100-i); //taking the minimum of the above values.
+                for (int a = 1; a <= action; a++){//loop thru all actions.
+                    if (i + a == 100){//terminal state reached.
                         reward = 1;
                     }
                     else{
                         reward = 0;
                     }
                     //here, if we make a stake, 0.4 prob of  winning, reward=0(except for terminal state)
-                    double newValue = pH * (0 + (gamma * valueMap.get(i + action)));
+                    double newValue = pH * (0 + (gamma * valueMap.get(i + a)));
                     //0.6 prob of losing, reward=0 (-1 for terminal state)
-                    newValue = newValue + (1-pH) * (0 + (gamma * valueMap.get(i - action)));
+                    newValue = newValue + (1-pH) * (0 + (gamma * valueMap.get(i - a)));
                     actionValuesMap.put(a, newValue);
                 }
-                double maxValue = -1.0;
-                int maxAction = -1;
-                for (int j = 1; j < 51 ; j++){
+                double maxValue = 0;
+                for (int j = 1; j <= action ; j++){
                     double temp = actionValuesMap.get(j);
                     if (temp > maxValue){
                         maxValue = temp;
-                        maxAction = j;
                     }
                 }
                 valueMap.put(i, maxValue); //finally value map has the max value from all the actions from the state
@@ -80,11 +75,7 @@ public class GamblersProblem {
         csvWriter.close();
         writer.close();
     }
-
-    public int generateRandomNo(){//generates a random no btw 0 and 100(both inclusive)
-        return ThreadLocalRandom.current().nextInt(0, 101);
-    }
-
+    
     public static void main(String[] args) throws IOException {
         GamblersProblem obj1 = new GamblersProblem();
         obj1.runGambler(0.1, "_1");
